@@ -1,13 +1,8 @@
-# -*- coding: utf-8 -*-
-"""
-Created on Tue Nov  2 16:18:42 2021
 
-@author: yipji
-"""
-import FishNet.models.net_factory as nf
+import models.network_factory as nf
 import torch
 import torch.nn as nn
-
+import os
 
 class FishNet150_count(nn.Module):
     def __init__(self, n_classes=1, pretrained = True, trainable = True, softmax = False):
@@ -20,7 +15,9 @@ class FishNet150_count(nn.Module):
         self.linear2 = nn.Linear(in_features = 256, out_features = self.n_classes)
         self.relu = nn.ReLU()
         if pretrained:
-            checkpoint = torch.load("./FishNet/checkpoints/fishnet150_ckpt.tar")
+            cwd = os.getcwd()
+            checkpoint_path = os.path.join(cwd, 'checkpoints/fishnet150_ckpt.tar')
+            checkpoint = torch.load(checkpoint_path)
             # best_prec1 = checkpoint['best_prec1']
             state_dict = checkpoint['state_dict']
         

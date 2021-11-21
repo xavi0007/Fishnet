@@ -1,7 +1,3 @@
-'''
-FishNet
-Author: Shuyang Sun
-'''
 from __future__ import division
 import torch
 import math

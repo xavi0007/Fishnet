@@ -1,10 +1,5 @@
-# -*- coding: utf-8 -*-
-"""
-Created on Tue Nov  2 16:18:42 2021
 
-@author: yipji
-"""
-import FishNet.models.net_factory as nf
+import models.network_factory as nf
 import torch
 import torch.nn as nn
 

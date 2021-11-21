@@ -7,21 +7,24 @@ Created on Sat Oct 30 19:05:13 2021
 
 import argparse
 from haven import haven_utils as hu
-import FishNet.models.net_factory as nf
+import models.network_factory as nf
 import pprint
 import torch
 import torch.nn as nn
-import exp_configs
-from DeepFish.src import utils as ut
-from DeepFish.src import models
+from utils import exp_configs
+import utils as ut
+import models
 from torch.utils.data import DataLoader
 from torch.utils.data.sampler import RandomSampler
+from torchvision import transforms
 
-from DeepFish.src.datasets.get_dataset import get_dataset
+from dataloaders import get_dataset
 
-from DeepFish.src import wrappers
 
-from FishNet150_seg import FishNet150_seg
+
+from models.FishNet150_count import FishNet150_count
+from models.FishNet150_cls import FishNet150_cls
+from models.FishNet201_cls import FishNet201_cls
 
 import pandas as pd
 
@@ -30,9 +33,10 @@ import time
 import torch.optim as optim
 import torch.optim.lr_scheduler as lr
 
-from fishy_utils import predict_acc, BCEDiceLoss, CrossEntropyLoss2d, MultiClass_FocalLoss
+from utils.fishy_utils import predict_acc, BCEDiceLoss, CrossEntropyLoss2d, MultiClass_FocalLoss
 
 import matplotlib.pyplot as plt
+import torchvision.models
 
 # datadir = r'C:/Users/yipji/Offline Documents/Big Datasets/DeepFish/DeepFish'
 
