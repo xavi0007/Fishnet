@@ -13,8 +13,8 @@ import torchvision.transforms as transforms
 from utils.data_aug import ColorAugmentation
 import os
 from torch.autograd.variable import Variable
-import models
-from models.network_factory import fishnet150
+import models_ablation
+from models_ablation.net_factory import fishnet150
 
 
 # screen -r fishnet
@@ -25,10 +25,6 @@ from models.network_factory import fishnet150
 
 
 best_prec1 = 0
-
-model_names = sorted(name for name in models.__dict__
-                     if name.islower() and not name.startswith("__")
-                     and callable(models.__dict__[name]))
 
 USE_GPU = torch.cuda.is_available()
 device = 'cuda' if torch.cuda.is_available() else 'cpu'
@@ -51,9 +47,10 @@ config = {
     'image_size': 256,
     'resume': False,
     'evaluate': False,
+ 
 }
 
-def main():
+def main(test_concat = True):
     global best_prec1, USE_GPU
     
 
@@ -66,12 +63,11 @@ def main():
         input_size = 224
     print("Input image size: {}, test size: {}".format(image_size, input_size))
 
-    model_names = sorted(name for name in models.__dict__
-                     if name.islower() and not name.startswith("__")
-                     and callable(models.__dict__[name]))
-                     
 
-    model = fishnet150()
+    if test_concat == True:
+        model = models_ablation.fishnet_wo_concat()
+    else:
+        model = fishnet150()
 
     # if USE_GPU:
     #     model = model.cuda()
@@ -198,9 +194,9 @@ def train(train_loader, model, criterion, optimizer, epoch):
 
         # compute output
 
-        if USE_GPU:
-            input_var = input.to(device)
-            target_var = target.to(device)
+   
+        input_var = input.to(device)
+        target_var = target.to(device)
 
         output = model(input_var)
 

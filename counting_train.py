@@ -6,26 +6,18 @@ Created on Sat Oct 30 19:05:13 2021
 """
 
 import argparse
-from haven import haven_utils as hu
-import models.network_factory as nf
-import pprint
 import torch
 import torch.nn as nn
 from utils import exp_configs
 import utils as ut
-import models
 from torch.utils.data import DataLoader
 from torch.utils.data.sampler import RandomSampler
 from torchvision import transforms
 
-
 from dataloaders import get_dataset
 
-import wrappers
 
 from models.FishNet150_count import FishNet150_count
-from models.FishNet150_cls import FishNet150_cls
-from models.FishNet201_cls import FishNet201_cls
 
 import pandas as pd
 
@@ -49,16 +41,22 @@ import matplotlib.pyplot as plt
     # net.cpu()
     # prediction = net(images.cpu()).round().squeeze()
     # accuracy = sum(prediction == labels)/len(labels)
+    
+
 use_cuda = torch.cuda.is_available()
 device = 'cuda' if torch.cuda.is_available() else 'cpu'
-    
+
 def predict_acc(net,loader):
     
     total_acc = 0
     total_batch = 0
-    for i in loader:                
-        total_acc += sum((net(i['images'].to(device)).squeeze()>0.5) == i['labels'].to(device))
-        total_batch += len(i['labels'])
+    for i in loader:
+        images = i['images'].to(device)
+        labels = i['counts'].to(device)
+        prediction = net(images).round().squeeze()
+        accuracy = sum(prediction == labels)/len(labels)
+        total_acc += accuracy
+        total_batch += 1
     
     final_acc = total_acc/total_batch
     
@@ -79,29 +77,31 @@ def predict_mae(net,loader):
     final_mae = total_mae/total_batch
     
     return final_mae
-    
-def main():
+
+if __name__ == "__main__":
+
     parser = argparse.ArgumentParser()
     parser.add_argument('-d', '--datadir',
                         type=str, default='C:/Users/yipji/Offline Documents/Big Datasets/DeepFish/DeepFish/')
-    parser.add_argument("-e", "--exp_config", default='clf')
+    parser.add_argument("-e", "--exp_config", default='fish_reg')
     parser.add_argument("-uc", "--use_cuda", type=int, default=0)
     args = parser.parse_args()
 
     device = torch.device('cuda' if args.use_cuda else 'cpu')
 
     exp_dict = exp_configs.EXP_GROUPS[args.exp_config][0]
-
-
+    
     # Dataset
     # Load val set and train set
+    val_set = get_dataset(dataset_name=exp_dict["dataset"], split="val",
+                                   transform=exp_dict.get("val_transform"),
+                                   datadir=args.datadir)
     train_set = get_dataset(dataset_name=exp_dict["dataset"],
                                      split="train", 
-                                     transform=exp_dict.get("transform"),
+                                     transform=exp_dict.get("train_transform"), #overwrite the existing dataset's transform with my own, which has additional image augmentations
                                      datadir=args.datadir)
-    
-    val_set = get_dataset(dataset_name=exp_dict["dataset"], split="val",
-                                   transform=exp_dict.get("transform"),
+    test_set = get_dataset(dataset_name=exp_dict["dataset"], split="test",
+                                   transform="resize_normalize",
                                    datadir=args.datadir)
 
     
@@ -112,42 +112,45 @@ def main():
                                                             len(train_set)), 
                                                             len(val_set))),
                             batch_size=exp_dict["batch_size"])
-
+    test_loader = DataLoader(test_set, shuffle=False, batch_size=exp_dict["batch_size"])
     val_loader = DataLoader(val_set, shuffle=False, batch_size=exp_dict["batch_size"])
     vis_loader = DataLoader(val_set, sampler=ut.SubsetSampler(train_set,
                                                      indices=[0, 1, 2]),
                             batch_size=1)
-    # get some random training images
-    dataiter = iter(train_loader)
-    # images, labels = dataiter.next().items()
+
+    # #visualize mask
+    # plt.imshow(transforms.ToPILImage()(next(iter(val_loader))['mask_classes']))
+    
+    # Create model, opt, wrapper
+    # model_original = models.get_model(exp_dict["model"], exp_dict=exp_dict).cuda()
     
     ##FISHNET MOEL##
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
-    net = FishNet150_cls().to(device)
-    # net.to(device)
+    net = FishNet150_count()
+    net.to(device)
     
     
     #Setting up the Run#
-    # net = models.get_model(exp_dict["model"], exp_dict=exp_dict).to(device)
+    # opt = torch.optim.Adam(net.parameters(), 
+    #                     lr=1e-3, weight_decay=0.0001)
+    # model_original = models.get_model(exp_dict["model"], exp_dict=exp_dict).cuda()
     # model = wrappers.get_wrapper(exp_dict["wrapper"], model=model_original, opt=opt).to(device)
     # model = wrappers.get_wrapper(exp_dict["wrapper"], model=net, opt=opt).to(device)
     
-    # criterion = nn.CrossEntropyLoss()
-    # criterion = nn.L1Loss()
-    criterion = nn.MSELoss().to(device)
+    criterion = nn.L1Loss()
+    # criterion = nn.MSELoss()
     # criterion = nn.BCEWithLogitsLoss().to(device) 
-    # criterion = nn.BCELoss().to(device)
     # criterion = BCEDiceLoss().to(device)
     # criterion = MultiClass_FocalLoss().to(device)
     # criterion = FocalLoss().to(device) 
     optimizer = optim.Adam(net.parameters(), lr=0.0001)
     # scheduler = lr.ReduceLROnPlateau(optimizer, 'min', patience = 2)
     # scheduler1 = lr.ExponentialLR(optimizer, gamma=0.9, verbose = True)
-    scheduler2 = lr.MultiStepLR(optimizer,milestones=[15],gamma=0.1, verbose = True)
+    scheduler2 = lr.MultiStepLR(optimizer,milestones=[15,25],gamma=0.1, verbose = True)
     
     #meta info
-    run_number = 6
-    model_name = 'fishnet150-clf'
+    run_number = 16
+    model_name = 'fishnet-regL1'
     total_epochs = exp_dict["max_epoch"]
     
     #setting up counters#
@@ -171,15 +174,15 @@ def main():
             
             # get the inputs; data is a list of [inputs, labels]
             inputs = data['images']
-            labels = data['labels']
+            labels = data['counts']
             inputs, labels = inputs.to(device), labels.to(device)
     
             # zero the parameter gradients
             optimizer.zero_grad()
     
             # forward + backward + optimize
-            outputs = net(inputs).squeeze()
-            # outputs = outputs.squeeze()
+            outputs = net(inputs)
+            outputs = outputs.squeeze()
             loss = criterion(outputs.float(), labels.float())
             loss.backward()
             optimizer.step()
@@ -187,36 +190,35 @@ def main():
             # print statistics
             running_loss += loss.item()
             # print(loss.item())
-            if i % 20 == 19:    # print every 2000 mini-batches
+            if i % 5 == 4:    # print every 2000 mini-batches
                 print('[%d, %5d] loss: %.3f' %
                       (epoch + 1, i + 1, running_loss / 20))
                 running_loss = 0.0
             
             # scheduler.step(round(loss.item(),6))
         # scheduler1.step()
-        scheduler2.step()
+        # scheduler2.step()
         
         ###Validation start counter
         tic2 = time.perf_counter()
         
         with torch.no_grad():
-            ep_train_acc = predict_acc(net,train_loader)
-            ep_val_acc = predict_acc(net,val_loader)
+            ep_train_acc = predict_mae(net,train_loader)
+            ep_val_acc = predict_mae(net,val_loader)
         train_avg_acc_by_epoch.append(ep_train_acc)    
         val_avg_acc_by_epoch.append(ep_val_acc)
         
     #     #Epoch End Counter
         toc = time.perf_counter()
-        print(f'train acc: {ep_train_acc:0.4f}')
-        print(f'val acc: {ep_val_acc:0.4f}')
+        print(f'train mae: {ep_train_acc:0.4f}')
+        print(f'val mae: {ep_val_acc:0.4f}')
         print(f"Epoch {epoch+1} of {total_epochs} Ended. Total epoch took {toc-tic:0.4f}s. Validation took {toc-tic2:04f}s")
     
-
     final_val = ep_val_acc
     torch.save(net.state_dict(), f'./models/Run{run_number}_{model_name}_{total_epochs:0.0f}ep_state.pth')
     plt.plot(train_avg_acc_by_epoch)
     plt.plot(val_avg_acc_by_epoch)
-    print(f'Finished Training. Total time {toc-tic0:0.4f}s, Final Validation acc {final_val:0.4f}')
+    print(f'Finished Training. Total time {toc-tic0:0.4f}s, Final Validation MAE {final_val:0.4f}')
     # print(f'Finished Training. Total time {toc-tic0:0.4f}s')
     
     
@@ -228,7 +230,6 @@ def main():
     # results = predict(net,test_dataloader)
     # np.savetxt(f'Run{run_number}_{model_name}_{total_epochs:0.0f}ep_PREDICTION.txt',torch.stack(results).numpy(),delimiter=" ",fmt = "%0.0f")
         
-
 #%%
 import matplotlib.pyplot as plt
 
@@ -246,7 +247,3 @@ f, ax = plt.subplots(2,1, figsize=(10,10))
 
 ax[0].imshow(net(next(iter(vis_loader))['images'][:1].cuda()).squeeze().cpu().detach().numpy())     
 ax[1].imshow(next(iter(vis_loader))['images'][0].squeeze().permute(1,2,0))  
-
-
-if __name__ == "__main__":
-    main()

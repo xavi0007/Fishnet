@@ -14,13 +14,13 @@ import os
 from torch.autograd.variable import Variable
 import models
 
-parser = argparse.ArgumentParser(description='PyTorch ImageNet Training')
+parser = argparse.ArgumentParser(description='CE7454 assignment fishnet')
 
 
 #class, seg, count, ablation
 parser.add_argument('--task', '-t', default='ablation')
 
-
+parser.add_argument('--path', default=os.get_cwd)
 
 def main():
     args = parser.parse_args()
@@ -29,7 +29,21 @@ def main():
         seg.main()
     if args.task == 'ablation':
         import ablation_cifar100 as ab
-        ab.main()
+        ab.main(test_concat = False)
+    if args.task == 'fashion':
+        import clf_fashion as fashion
+        fashion.main()
+    if args.task == 'counting':
+        import counting_test as counting
+        counting.main(args.path)
+    if args.task == 'deepfish':
+        import clf as classify
+        classify.main()
+    if args.task == 'cifar':
+        import ablation_cifar100 as ab
+        ab.main(test_concat = True)
+    
+
     
     
 

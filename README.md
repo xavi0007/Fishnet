@@ -33,13 +33,30 @@ to run the ablation study code on cifar 100 dataset.
 
 The list of tasks includes: 
 <li>
-ablation
-classification
-counting
-segmentation
+<ul >ablation</ul>
+<ul>counting</ul>
+<ul>segmentation</ul>
 </li>
 
+For counting, a model path has to be specified like so
 
+```
+python main.py --task counting --path <your dir to the model>
+```
+
+For classification task, we did for deepfish, fashion and cifar100
+hence instead of specifing the task as classification, you would specify the dataset like so.
+
+```
+python main.py --task fashion
+```
+
+The list for classification is as follow:
+<li>
+<ul>fashion</ul>
+<ul>deepfish</ul>
+<ul>cifar</ul>
+</li>
 
 ### Citation
 [FishNet: A Versatile Backbone for Image, Region, and Pixel Level Prediction](http://papers.nips.cc/paper/7356-fishnet-a-versatile-backbone-for-image-region-and-pixel-level-prediction.pdf)

@@ -36,7 +36,7 @@ use_cuda = torch.cuda.is_available()
 device = 'cuda' if torch.cuda.is_available() else 'cpu'
 
 img_size = (224, 224)
-root_dir = "/Users/xavier/Programming/FishNet"
+root_dir = os.getcwd()
 
 use_mode = 'train'  # train
 class_names = [
