@@ -27,6 +27,9 @@ def main():
     if args.task == 'segmentation':
         import semantic_segmentation as seg
         seg.main()
+    if args.task == 'test_seg':
+        import semantic_segmentation as seg
+        seg.test()
     if args.task == 'ablation':
         import ablation_cifar100 as ab
         ab.main(test_concat = False)
@@ -37,8 +40,8 @@ def main():
         import counting_test as counting
         counting.main(args.path)
     if args.task == 'deepfish':
-        import clf as classify
-        classify.main()
+        import clf_test as classify
+        classify.main(args.path)
     if args.task == 'cifar':
         import ablation_cifar100 as ab
         ab.main(test_concat = True)

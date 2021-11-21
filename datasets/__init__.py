@@ -1,6 +1,9 @@
-from datasets import fish_clf, fish_reg, fish_loc
+
+# from . import trancos, fish_reg
+from . import fish_clf, fish_reg, fish_loc, fish_seg
 from torchvision import transforms
 import cv2, os
+import utils as ut
 import pandas as pd
 import numpy as np
 
@@ -31,8 +34,21 @@ def get_dataset(dataset_name, split, transform=None,
                                datadir=datadir+ "/Localization/", 
                                habitat=habitat)
 
-    return dataset                        
+    return dataset
 
+
+# ===================================================
+# helpers
+def slice_df(df, habitat):
+    if habitat is None:
+        return df
+    return df[df['ID'].apply(lambda x: True if x.split("/")[0] == habitat else False)]
+
+def slice_df_reg(df, habitat):
+    if habitat is None:
+        return df
+    return df[df['ID'].apply(lambda x: True if x.split("/")[1].split("_")[0] 
+                        == habitat else False)]
 
 def get_transformer(transform, split):
     if transform == "resize_normalize":
@@ -56,3 +72,4 @@ def get_transformer(transform, split):
             [
              transforms.ToTensor(),
              normalize_transform])
+

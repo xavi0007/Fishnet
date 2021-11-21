@@ -20,16 +20,21 @@ To get started, simply run main.py
 python main.py --task <The task>
 ```
 There are serveral tasks that can be done with Fishnet architecture.
-For segmentation tasks on the deepfish dataset simply run.
+For train a model for segmentation tasks on the deepfish dataset simply run.
 ```
 python main.py --task segmentation
 ```
-or 
+To test it
+```
+python main.py --task test_seg
+```
+
+Alternatively to run the ablation study code on cifar 100 dataset,
 
 ```
 python main.py --task ablation
 ```
-to run the ablation study code on cifar 100 dataset.
+
 
 The list of tasks includes: 
 <li>
@@ -57,6 +62,19 @@ The list for classification is as follow:
 <ul>deepfish</ul>
 <ul>cifar</ul>
 </li>
+
+For deepfish, model path has also to be specified like so. Otherwise for the other two classification, models are created ad-hoc.
+
+```
+python main.py --task deepfish --path <your dir to the model>
+```
+
+
+There are other files from the source code like, clf.py which is used to train a fishnet150 network to classify  the fishes.
+You could directly run it with 
+```
+python3 clf.py
+```
 
 ### Citation
 [FishNet: A Versatile Backbone for Image, Region, and Pixel Level Prediction](http://papers.nips.cc/paper/7356-fishnet-a-versatile-backbone-for-image-region-and-pixel-level-prediction.pdf)

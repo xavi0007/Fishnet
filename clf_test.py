@@ -20,11 +20,13 @@ from torch.utils.data.sampler import RandomSampler
 from torchvision import transforms
 
 
-from DeepFish.src.datasets.get_dataset import get_dataset
+from dataloaders import get_dataset
 
-from DeepFish.src import wrappers
+import wrappers
 
-from FishNet150_cls import FishNet150_cls
+from models.FishNet150_count import FishNet150_count
+from models.FishNet150_cls import FishNet150_cls
+from models.FishNet201_cls import FishNet201_cls
 
 import pandas as pd
 
@@ -33,10 +35,12 @@ import time
 import torch.optim as optim
 import torch.optim.lr_scheduler as lr
 
-from fishy_utils import predict_acc, BCEDiceLoss, CrossEntropyLoss2d, MultiClass_FocalLoss
+from utils.fishy_utils import predict_acc, BCEDiceLoss, CrossEntropyLoss2d, MultiClass_FocalLoss
 
 import matplotlib.pyplot as plt
 
+use_cuda = torch.cuda.is_available()
+device = 'cuda' if torch.cuda.is_available() else 'cpu'
 
 
 def predict_acc(net,loader):
