@@ -12,6 +12,7 @@ The model classes in this repository will load the FishNet150 model from the ori
 ### Prerequisites
 - Python 3.6.x
 - PyTorch 0.4.0+
+- DeepFish dataset downloaded, and added to directory data/DeepFish
 
 ### Training
 

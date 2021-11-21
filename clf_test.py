@@ -1,25 +1,10 @@
-# -*- coding: utf-8 -*-
-"""
-Created on Thu Nov 18 00:49:06 2021
-
-@author: yipji
-"""
-
 import os
-import argparse
-from haven import haven_utils as hu
-import models.network_factory as nf
-import pprint
+
+
+
+
 import torch
-import torch.nn as nn
-from utils import exp_configs
-import utils as ut
-import models
 from torch.utils.data import DataLoader
-from torch.utils.data.sampler import RandomSampler
-from torchvision import transforms
-
-
 from dataloaders import get_dataset
 
 
@@ -54,9 +39,9 @@ def predict_acc(net,loader):
     
     return final_acc
 
-if __name__ == "__main__":
+def main(model_path):
 
-    
+
     # Dataset
     # Load val set and train set
 
@@ -77,9 +62,13 @@ if __name__ == "__main__":
     ##FISHNET MOEL##
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
     net = FishNet150_cls().to(device)
-    net.load_state_dict(torch.load('./models/Run6_fishnet150-clf_25ep_state.pth'))
+    net.load_state_dict(torch.load(model_path))
     
     with torch.no_grad():
         test = predict_acc(net, test_loader)
     
     print(test)
+
+
+if __name__ == "__main__":
+    main(os.getcwd())

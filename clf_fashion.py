@@ -1,10 +1,3 @@
-# -*- coding: utf-8 -*-
-"""
-Created on Thu Nov 11 12:01:36 2021
-
-@author: yipji
-"""
-
 
 from pathlib import Path
 import torch

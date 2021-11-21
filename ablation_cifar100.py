@@ -1,13 +1,14 @@
-import argparse
+
 import time
-import yaml
+
 import torch
 import torch.backends.cudnn as cudnn
 import torch.nn as nn
 import torch.nn.parallel
 import torch.optim
 import torch.utils.data
-import torchvision.datasets as datasets
+
+
 from torchvision.datasets import CIFAR100
 import torchvision.transforms as transforms
 from utils.data_aug import ColorAugmentation

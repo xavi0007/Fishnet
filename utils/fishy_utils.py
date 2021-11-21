@@ -12,16 +12,6 @@ import torch.nn as nn
 # labs = next(iter(vis_loader))['mask_classes'].cuda()
 
 def f_score(pr, gt, beta=1, eps=1e-7, threshold=0.5, activation='none'):
-    """
-    Copied from https://www.kaggle.com/dhananjay3/image-segmentation-from-scratch-in-pytorch
-    Args:
-        pr (torch.Tensor): A list of predicted elements
-        gt (torch.Tensor):  A list of elements that are to be predicted
-        eps (float): epsilon to avoid zero division
-        threshold: threshold for outputs binarization
-    Returns:
-        float: IoU (Jaccard) score
-    """
 
     if activation is None or activation == "none":
         activation_fn = lambda x: x

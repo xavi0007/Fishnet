@@ -1,9 +1,3 @@
-# -*- coding: utf-8 -*-
-"""
-Created on Sat Oct 30 19:05:13 2021
-
-@author: yipji
-"""
 
 import argparse
 import torch

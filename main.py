@@ -20,7 +20,7 @@ parser = argparse.ArgumentParser(description='CE7454 assignment fishnet')
 #class, seg, count, ablation
 parser.add_argument('--task', '-t', default='ablation')
 
-parser.add_argument('--path', default=os.get_cwd)
+parser.add_argument('--path', default=os.getcwd())
 
 def main():
     args = parser.parse_args()
@@ -38,10 +38,10 @@ def main():
         fashion.main()
     if args.task == 'counting':
         import counting_test as counting
-        counting.main(args.path)
+        counting.main(model_path = args.path)
     if args.task == 'deepfish':
         import clf_test as classify
-        classify.main(args.path)
+        classify.main(model_path = args.path)
     if args.task == 'cifar':
         import ablation_cifar100 as ab
         ab.main(test_concat = True)

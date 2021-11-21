@@ -1,9 +1,4 @@
-# -*- coding: utf-8 -*-
-"""
-Created on Thu Nov 18 00:49:06 2021
 
-@author: yipji
-"""
 import os
 import argparse
 from haven import haven_utils as hu
@@ -20,7 +15,6 @@ from torchvision import transforms
 
 from dataloaders import get_dataset
 
-import wrappers
 
 from models.FishNet150_count import FishNet150_count
 
@@ -61,7 +55,7 @@ def main(model_path):
     # Dataset
     # Load val set and train set
     cwd = os.getcwd()
-    data_dir = os.path.join(cwd,'data')
+    data_dir = os.path.join(cwd,'data/Deepfish')
     test_set = get_dataset(dataset_name="fish_reg", split="test",
                                    transform="resize_normalize",
                                    datadir=data_dir)
@@ -83,6 +77,6 @@ def main(model_path):
     print(test)
 
 if __name__ == "__main__":
-    main()
+    main(model_path=os.getcwd)
 
    

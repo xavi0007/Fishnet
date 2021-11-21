@@ -1,9 +1,4 @@
-# -*- coding: utf-8 -*-
-"""
-Created on Sat Oct 30 19:05:13 2021
 
-@author: yipji
-"""
 
 import argparse
 from haven import haven_utils as hu
@@ -21,7 +16,6 @@ from torchvision import transforms
 
 from dataloaders import get_dataset
 
-import wrappers
 
 from models.FishNet150_count import FishNet150_count
 from models.FishNet150_cls import FishNet150_cls

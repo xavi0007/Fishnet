@@ -1,9 +1,4 @@
-# -*- coding: utf-8 -*-
-"""
-Created on Sat Oct 30 19:05:13 2021
 
-@author: yipji
-"""
 import argparse
 from haven import haven_utils as hu
 import models.network_factory as nf
@@ -19,7 +14,6 @@ from torchvision import transforms
 
 from dataloaders import get_dataset
 
-import wrappers
 
 from models.FishNet150_count import FishNet150_count
 from models.FishNet150_cls import FishNet150_cls
@@ -100,7 +94,6 @@ if __name__ == "__main__":
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
     net = resnet50()
     net.to(device)
-    
     net.load_state_dict(torch.load('./models/Run7_resnet50-clf_25ep_state.pth'))
         
     with torch.no_grad():
