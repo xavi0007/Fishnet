@@ -71,11 +71,13 @@ python main.py --task deepfish --path <your dir to the model>
 
 
 There are other files from the source code like, clf.py which is used to train a fishnet150 network to classify  the fishes.
-You could directly run it with 
+You could directly run it with options like so
 ```
-python3 clf.py
+python3 clf.py --datadir <dir of dataset > --exp_config <config file>  --use_cuda 0
 ```
-
+```
+python3 resnet50_test.py
+```
 ### Citation
 [FishNet: A Versatile Backbone for Image, Region, and Pixel Level Prediction](http://papers.nips.cc/paper/7356-fishnet-a-versatile-backbone-for-image-region-and-pixel-level-prediction.pdf)
 , Shuyang Sun, Jiangmiao Pang, Jianping Shi, Shuai Yi, Wanli Ouyang, NeurIPS 2018.

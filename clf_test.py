@@ -5,7 +5,7 @@ Created on Thu Nov 18 00:49:06 2021
 @author: yipji
 """
 
-
+import os
 import argparse
 from haven import haven_utils as hu
 import models.network_factory as nf
@@ -22,7 +22,6 @@ from torchvision import transforms
 
 from dataloaders import get_dataset
 
-import wrappers
 
 from models.FishNet150_count import FishNet150_count
 from models.FishNet150_cls import FishNet150_cls
@@ -57,28 +56,21 @@ def predict_acc(net,loader):
 
 if __name__ == "__main__":
 
-    parser = argparse.ArgumentParser()
-    parser.add_argument('-d', '--datadir',
-                        type=str, default='C:/Users/yipji/Offline Documents/Big Datasets/DeepFish/DeepFish/')
-    parser.add_argument("-e", "--exp_config", default='clf')
-    parser.add_argument("-uc", "--use_cuda", type=int, default=0)
-    args = parser.parse_args()
-
-    device = torch.device('cuda' if args.use_cuda else 'cpu')
-
-    exp_dict = exp_configs.EXP_GROUPS[args.exp_config][0]
     
     # Dataset
     # Load val set and train set
 
-    test_set = get_dataset(dataset_name=exp_dict["dataset"], split="test",
+    cwd = os.getcwd()
+    data_dir = os.path.join(cwd,'data/DeepFish')
+
+    test_set = get_dataset(dataset_name='fish_clf', split="test",
                                    transform="resize_normalize",
-                                   datadir=args.datadir)
+                                   datadir=data_dir)
 
     
     # Load train loader, val loader, and vis loader
 
-    test_loader = DataLoader(test_set, shuffle=False, batch_size=exp_dict["batch_size"])
+    test_loader = DataLoader(test_set, shuffle=False, batch_size=64)
 
 
 
